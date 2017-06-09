@@ -40,7 +40,7 @@ int default_track_set = 2;
 //0.0 = full volume.
 //-100 = off.
 //try -10, -20, -30, and -40 to make it quieter. DB is weird.
-final float background_volume_db = -40.0;
+final float background_volume_db = 0.0;
 
 
 void setup() {
