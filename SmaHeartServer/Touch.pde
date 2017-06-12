@@ -25,7 +25,7 @@ void HandleStateChange( int state, int board_id ) {
   //detect touch, any device, to trigger LED Lab.
   if ( ((BoardStates[board_id] & 1) == 0 ) &&  ((state & 1) != 0 ) ) {
     println("generic hit trigger!");
-    SendLedLabTrigger();
+    //SendLedLabTrigger();
   }
 
   //update the saved states.
@@ -59,6 +59,7 @@ void UpdateDmxFromState() {
   if( DmxSequence != touch_count ) {
     DmxSequence = touch_count;
     SelectDmxSequence( DmxSequence );
+    SelectLedLabScene( DmxSequence );
   }
 
   println("input has " + str( touch_count ) + " activations");

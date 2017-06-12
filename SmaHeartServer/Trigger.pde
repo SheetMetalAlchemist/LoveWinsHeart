@@ -39,7 +39,7 @@ void SelectDmxScene( int scene ) {
 }
 
 void SelectDmxSequence( int sequence ) {
-
+  sequence++; //no sequence 0
   OscMessage myMessage = new OscMessage("/sequences/" + str(sequence) + "/activate");
   myMessage.add(1); 
   oscP5.send(myMessage, LuminairIp); 

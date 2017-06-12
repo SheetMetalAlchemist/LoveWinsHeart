@@ -15,8 +15,8 @@ AudioPlayer backgroundSound;
 
 //OSC
 OscP5 oscP5;
-NetAddress LedLabIp = new NetAddress("10.0.1.15", 1234);
-NetAddress LuminairIp = new NetAddress("192.168.1.133", 8000);
+NetAddress LedLabIp = new NetAddress("192.168.1.2", 1234);
+NetAddress LuminairIp = new NetAddress("192.168.1.4", 8000);
 
 
 //application
@@ -40,7 +40,7 @@ int default_track_set = 2;
 //0.0 = full volume.
 //-100 = off.
 //try -10, -20, -30, and -40 to make it quieter. DB is weird.
-final float background_volume_db = 0.0;
+final float background_volume_db = -10.0;
 
 
 void setup() {
