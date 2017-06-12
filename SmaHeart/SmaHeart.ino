@@ -33,11 +33,13 @@ unsigned int remotePort = 8888;
 #define LED_PIN 6
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
 
+//button stuff:
+#define BUTTON_PIN  5
 
 
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
 
 
   //board ID & Network stuff:
@@ -59,13 +61,10 @@ void setup() {
   Ethernet.begin(mac, LocalIp);
   Udp.begin(localPort);
 
+  //InitCapSense();
 
-  //captouch stuff:
-  if (!cap.begin()) {
-    Serial.println("CAP1188 not found");
-    while (1);
-  }
-  Serial.println("CAP1188 found!");
+  //init button:
+  pinMode(BUTTON_PIN, INPUT_PULLUP);
 
   //LED stuff:
   strip.begin();
@@ -73,23 +72,74 @@ void setup() {
 }
 
 
+
+void InitCapSense()
+{
+
+  //captouch stuff:
+  if (!cap.begin()) {
+    Serial.println("CAP1188 not found");
+    while (1);
+  }
+  Serial.println("CAP1188 found!");
+  //delay(1000);
+  cap.writeRegister( 0x00, 0 << 6 ); // set gain to 1 (default 0)
+
+  cap.writeRegister(0x1F, 0x0F); //sensitivty = 7F least sensitive, 1F most sensitive, 3F default;
+  cap.writeRegister(CAP1188_STANDBYCFG, 0x70); //number of samples averaged 0x30 = 8 = default, 0x70 = 128
+
+  //input enable
+  cap.writeRegister( 0x21, 0x01 ); //disable all inputs but #1
+
+  cap.writeRegister( 0x26, 0x01 ); //init recal on input 1.
+  delay(600); //wait for call to finish, 600 ms?
+
+}
+
 void loop() {
-  ProcessTouches();
+
+  //Serial.println("loop");
+  //ProcessTouches();
+  //DebugPrintCapSense();
+  ProcessButton();
   delay(5);
+}
+
+void ProcessButton()
+{
+  bool activated = digitalRead(BUTTON_PIN) == LOW; //internal pull-up reads high when not-active.
+  //Serial.print("state: ");
+  //Serial.println(activated);
+  byte new_state = 0;
+  if( activated == true ) {
+    new_state = 1;
+  }
+  if( !initial_state_sent ) {
+    initial_state_sent = true;
+    HandleStateChanged(new_state);
+    last_state = new_state;
+    return;
+  }
+
+  if( new_state != last_state ) {
+
+    HandleStateChanged(new_state);
+  }
+  last_state = new_state;
 }
 
 void ProcessTouches()
 {
   byte touched = cap.touched();
 
-  if( initial_state_sent == false ) {
+  if ( initial_state_sent == false ) {
     initial_state_sent = true;
     HandleStateChanged( touched );
   } else {
-    if( touched != last_state ) {
+    if ( touched != last_state ) {
       HandleStateChanged( touched );
     }
-    
+
   }
   last_state = touched;
 }
@@ -101,11 +151,11 @@ void HandleStateChanged( byte state ) {
 
   //send the state over the network.
   TransmitState( state, BoardId );
-
+  return;
 
   //LED opperations
-  for(int i = 0; i < 8; ++i ) {
-    if( state & (1<<i)) {
+  for (int i = 0; i < 8; ++i ) {
+    if ( state & (1 << i)) {
       strip.setPixelColor( i, strip.Color(127, 127, 127) );
     } else {
       strip.setPixelColor( i, strip.Color(0, 0, 0) );
@@ -116,47 +166,19 @@ void HandleStateChanged( byte state ) {
 
 void TransmitState( byte state, byte board_id ) {
 
-  
+
   char tx_buffer[32];
   snprintf(tx_buffer, 32, "board:%i,state:%i\n", board_id, state);
 
   Serial.print("udp tx message: ");
   Serial.println(tx_buffer);
   //return;
-  
+
   Udp.beginPacket(RemoteIp, remotePort);
   Udp.write(tx_buffer, strlen(tx_buffer));
   Udp.endPacket();
-  
+  //Serial.println("finished sending packet");
 }
-/*
-void HandleTouchDown( int key )
-{
-  strip.setPixelColor( key, strip.Color(127, 127, 127) );
-  strip.show();
-  
-  Serial.print("key-down event: ");
-  Serial.println(key, DEC);
-
-  Udp.beginPacket(RemoteIp, remotePort);
-  Udp.write("keydown:");
-  Udp.write((char)('0'+key));
-  Udp.endPacket();
-}
-
-void HandleTouchUp( int key )
-{
-  strip.setPixelColor( key, strip.Color(0, 0, 0) );
-  strip.show();
-  
-  Serial.print("key-up event: ");
-  Serial.println(key, DEC);
-
-  Udp.beginPacket(RemoteIp, remotePort);
-  Udp.write("keyup:");
-  Udp.write((char)('0'+key));
-  Udp.endPacket();
-}*/
 
 
 void ClearId()
@@ -223,5 +245,63 @@ byte GetBoardId()
       Serial.println("\nInvalid entry, please try again.");
     }
   }
+}
+
+void DebugPrintCapSense()
+{
+  byte sensor_1_input_delta_count = cap.readRegister( 0x10 );
+  byte sensor_8_input_delta_count = cap.readRegister( 0x17 );
+
+  byte sensor_1_input_delta_count_threshold = cap.readRegister( 0x30 );
+  byte sensor_8_input_delta_count_threshold = cap.readRegister( 0x37 );
+
+  byte sensor_imput_noise_threshold = cap.readRegister( 0x38 );
+
+  byte sensor_1_base_count = cap.readRegister( 0x50 );
+  byte sensor_8_base_count = cap.readRegister( 0x57 );
+
+  byte sensor_1_input_cal = cap.readRegister( 0xB1 );
+  byte sensor_8_input_cal = cap.readRegister( 0xB8 );
+
+  byte sensors_1_to_4_lsb_cal = cap.readRegister( 0xB9 );
+  byte sensors_5_to_8_lsb_cal = cap.readRegister( 0xBA );
+
+  byte touched = cap.touched();
+
+  Serial.print("\n\n");
+  Serial.print("touched: ");
+  Serial.println(touched, BIN);
+  Serial.print("sensor_1_input_delta_count ");
+  Serial.println( sensor_1_input_delta_count, HEX );
+  Serial.print("sensor_8_input_delta_count ");
+  Serial.println( sensor_8_input_delta_count, HEX );
+
+  Serial.print("sensor_1_input_delta_count_threshold ");
+  Serial.println( sensor_1_input_delta_count_threshold, HEX );
+  Serial.print("sensor_8_input_delta_count_threshold ");
+  Serial.println( sensor_8_input_delta_count_threshold, HEX );
+
+  Serial.print("sensor_imput_noise_threshold ");
+  Serial.println( sensor_imput_noise_threshold, HEX );
+
+
+  Serial.print("sensor_1_base_count ");
+  Serial.println( sensor_1_base_count, HEX );
+  Serial.print("sensor_8_base_count ");
+  Serial.println( sensor_8_base_count, HEX );
+
+  Serial.print("sensor_1_input_cal ");
+  Serial.println( sensor_1_input_cal, HEX );
+  Serial.print("sensor_8_input_cal ");
+  Serial.println( sensor_8_input_cal, HEX );
+
+  Serial.print("sensors_1_to_4_lsb_cal ");
+  Serial.println( sensors_1_to_4_lsb_cal, HEX );
+  Serial.print("sensors_5_to_8_lsb_cal ");
+  Serial.println( sensors_5_to_8_lsb_cal, HEX );
+
+
+  //ProcessTouches();
+
 }
 
