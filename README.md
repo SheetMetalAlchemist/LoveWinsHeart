@@ -14,13 +14,13 @@ In the data folder. place a single file titled "background.mp3" to be used as th
 
 Set the static IP of the server to the same value set in the Arduinos, `192.168.1.109`
 
-In LED Lab, set the active scene to trigger from OSC, and set the single address to `/trigger`
+In LED Lab, go to the External Control Setup screen, and set Scene invocation to OSC, and set the address to `/scene`. 
 
-In LED Lab, go to the External Control Setup screen, and set Scene invocation to OSC, and set the address to `/scene`. This isn't actually in use right now, but we might need to activate it later.
+If we decide to go back to using OSC packets for the trigger, then in LED Lab, set the active scene to trigger from OSC, and set the single address to `/trigger`. This isn't actually in use right now.
 
 In Luminair, open the settings, scroll down to "remote control", and select OSC input. Enable this, with the default port 8000.
 
-In Luminair, make sure there are 5 different sequences to choose between. The app will use sequences 0 to 4.
+In Luminair, make sure there are 5 different sequences to choose between. The app will use sequences 1 to 5.
 
 The volume of the background track can be adjusted independently of the other tracks with the `background_volume_db` variable. Unfortunately it's in DB, so you will need to experimentally find a volume you like. 0.0 is maximum volume, and -100 is mute. It's a log scale.
 
@@ -54,3 +54,18 @@ Main track fade time can be adjusted with the variables `fade_in_time_ms` and `f
 Background track fade time is the same for fading in and fading out, and is controlled by `background_fade_time_ms`.
 
 The default set of tracks loaded is set to the 3rd folder (2, in a zero based indexing system). If fewer than 3 folders are present, it will default to the first folder. This can be changed with the `default_track_set` variable.
+
+## LED Lab troubleshooting:
+
+If Scene selection isn't working in LED Lab, do the following:
+
+1. check the IP address - does it match the one in the processing sketch?
+2. Restart LED Lab
+3. In LED Lab,go to the External Control Setup screen, and set Scene invocation to OSC, and set the address to `/scene`.
+
+## Hardware notes:
+
+Connect Ethernet first, then power. If the Arduino turns on before Ethernet is connected, you will need to restart the Arduino.
+
+If the button feels stuck and is not clicking properly, it is probably being pushed up against the bottom plate inside of the enclosure. 
+
