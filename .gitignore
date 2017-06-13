@@ -1,5 +1,4 @@
 *.tmp
 SmaAudioPlayer/obj
 SmaAudioPlayer/bin
-SmaAudioPlayer/packages
 *.suo
