@@ -43,9 +43,9 @@ namespace SmaAudioPlayer
         private void Window_Loaded( object sender, RoutedEventArgs e )
         {
             string exe_path = Environment.CurrentDirectory;
-            if( exe_path.Contains( "LoveWinsHeart" ) == false )
+            if( exe_path.Contains( "\\SmaAudioPlayer" ) == false )
                 throw new Exception( "unable to self locate audio files" );
-            string audio_data_folder = exe_path.Substring( 0, exe_path.IndexOf( "LoveWinsHeart" ) + "LoveWinsHeart".Length );
+            string audio_data_folder = exe_path.Substring( 0, exe_path.LastIndexOf( "\\SmaAudioPlayer" )  );
             audio_data_folder += "\\SmaHeartServer\\data";
 
             directories = System.IO.Directory.GetDirectories( audio_data_folder );
@@ -64,30 +64,42 @@ namespace SmaAudioPlayer
 
         private void Listener_NewMessageReceived( object sender, MyMessageArgs e )
         {
-            if( e.data.Length != 5 )
+            this.Dispatcher.Invoke( () =>
             {
-                Console.WriteLine( "invalid packet received!" );
-                return;
-            }
-
-            int[] data = e.data.Select( x => int.Parse( new string( ( char )x, 1 ) ) ).ToArray();
-
-            int new_track_set = data[ 0 ];
-
-            if( new_track_set != FolderSet )
-            {
-                FolderSet = new_track_set;
-                PlayFolderSet( directories[ FolderSet ] );
-            }
+                try
+                {
 
 
-            for( int i = 0; i < 4; ++i  )
-            { 
-                NetworkState[ i ] = data[ i + 1 ] == 1 ? true : false;
-            }
-            UpdatePlaybackFromState();
+                    if( e.data.Length != 5 )
+                    {
+                        Console.WriteLine( "invalid packet received!" );
+                        return;
+                    }
 
-            Console.WriteLine( String.Join( " ", e.data.Select( x => ( char )x ) ) );
+                    int[] data = e.data.Select( x => int.Parse( new string( ( char )x, 1 ) ) ).ToArray();
+
+                    int new_track_set = data[ 0 ];
+
+                    if( new_track_set != FolderSet )
+                    {
+                        FolderSet = new_track_set;
+                        PlayFolderSet( directories[ FolderSet ] );
+                    }
+
+
+                    for( int i = 0; i < 4; ++i )
+                    {
+                        NetworkState[ i ] = data[ i + 1 ] == 1 ? true : false;
+                    }
+                    UpdatePlaybackFromState();
+
+                    Console.WriteLine( String.Join( " ", e.data.Select( x => ( char )x ) ) );
+                }
+                catch( Exception ex )
+                {
+                    Console.WriteLine( "exception when processing command: " + ex.Message );
+                }
+            } );
         }
 
         private void PlayFolderSet( string folder )
