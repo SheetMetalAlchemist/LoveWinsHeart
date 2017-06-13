@@ -29,9 +29,9 @@ void LoadSongs() {
     println( join( LoadedSongs.get(i).array(), ", " ) );
   }
 
-  backgroundSound = minim.loadFile( "background.mp3" );
-  backgroundSound.setGain(-100);
-  backgroundSound.loop();
+  //backgroundSound = minim.loadFile( "background.mp3" );
+  //backgroundSound.setGain(-100);
+  //backgroundSound.loop();
 }
 
 

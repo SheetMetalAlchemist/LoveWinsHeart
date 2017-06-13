@@ -55,20 +55,22 @@ void setup() {
 
   //setup sound
   //InitSound();
-  minim = new Minim(this);
+  //minim = new Minim(this);
   LoadSongs();
   
-  if( default_track_set >= LoadedFolders.size() ) {
-      default_track_set = 0;
-  }
-  StartSoundFromFolder(default_track_set);
+  //if( default_track_set >= LoadedFolders.size() ) {
+  //    default_track_set = 0;
+  //}
+  //StartSoundFromFolder(default_track_set);
 
   for ( int i = 0; i < NumBoards; ++i ) {
     BoardStates[i] = 0;
     ManualInputs[i] = false;
   }
 
-  UpdatePlaybackFromSavedState();
+  //UpdatePlaybackFromSavedState();
+  RemoteUpdatePlaybackFromSavedState();
+  
 
   Timer = millis();
   //exit();
@@ -93,7 +95,10 @@ void keyPressed() {
    if( next_track >= LoadedFolders.size() ) {
      next_track = 0; 
    }
-   StartSoundFromFolder(next_track);
+
+   //StartSoundFromFolder(next_track);
+   LoadedTrackSet = next_track;
+   RemoteUpdatePlaybackFromSavedState();
    return;
   } else if( key == '-' ) {
     println("previous folder");
@@ -101,7 +106,9 @@ void keyPressed() {
     if( next_track < 0 ) {
       next_track = LoadedFolders.size() - 1;
     }
-    StartSoundFromFolder(next_track);
+    //StartSoundFromFolder(next_track);
+    LoadedTrackSet = next_track;
+    RemoteUpdatePlaybackFromSavedState();
     return;
   }
 
@@ -116,7 +123,7 @@ void keyPressed() {
     //this will also stop audio playback if no other keys are pressed.
     println("Resetting...");
     ManuallyResetStates();
-    Resync();
+    //Resync();
     return;
   }
   //filter out all but the numbers 1 to 4.
@@ -137,7 +144,8 @@ void keyPressed() {
     UpdateDmxFromState();
 
     //now that we've set our override flag, lets update playback.
-    UpdatePlaybackFromSavedState();
+    //UpdatePlaybackFromSavedState();
+    RemoteUpdatePlaybackFromSavedState();
   }
 }
 
@@ -157,7 +165,8 @@ void keyReleased() {
     UpdateDmxFromState();
 
     //now that we've cleared our override flag, lets update playback.
-    UpdatePlaybackFromSavedState();
+    //UpdatePlaybackFromSavedState();
+    RemoteUpdatePlaybackFromSavedState();
   }
 }
 
@@ -171,7 +180,7 @@ void draw()
   int padding = 20;
   text(display_message, padding, padding, width-(padding*2), height-(padding*2));
 
-  IntervalTimer30s();
+  //IntervalTimer30s();
 }
 
 void IntervalTimer30s() {

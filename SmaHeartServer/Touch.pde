@@ -10,7 +10,8 @@ void ManuallyResetStates() {
   for ( int i = 0; i < NumBoards; ++i ) {
     BoardStates[i] = 0;
   }
-  UpdatePlaybackFromSavedState();
+  //UpdatePlaybackFromSavedState();
+  RemoteUpdatePlaybackFromSavedState();
 }
 
 
@@ -35,7 +36,8 @@ void HandleStateChange( int state, int board_id ) {
   UpdateDmxFromState();
 
   //call over to the Sound File.
-  UpdatePlaybackFromSavedState();
+  //UpdatePlaybackFromSavedState();
+  RemoteUpdatePlaybackFromSavedState();
 }
 
 void UpdateDmxFromState() {

@@ -1,0 +1,8 @@
+﻿<Window x:Class="SmaAudioPlayer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        FontFamily="Segoe UI Light" 
+        Title="Music to Code By" Height="600" Width="800" Background="#333333" Foreground="White" Loaded="Window_Loaded" KeyDown="Window_KeyDown" KeyUp="Window_KeyUp">
+    <Label x:Name="xStatus" Content="Loading..." Foreground="White" FontSize="18" />
+
+</Window>
