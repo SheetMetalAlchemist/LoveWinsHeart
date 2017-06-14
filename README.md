@@ -69,3 +69,25 @@ Connect Ethernet first, then power. If the Arduino turns on before Ethernet is c
 
 If the button feels stuck and is not clicking properly, it is probably being pushed up against the bottom plate inside of the enclosure. 
 
+Button Connections: Connect 1 pin on the button to pin 5, and the other pin to ground. You can swap these two.
+
+use the center tab of the 3 tabs on the arcade button, and the tab at the end of the button. It's the tab that's mounded on the back instead of the side.
+
+
+## Replacing parts:
+
+**Ethernet Shield:** Just swap these out, nothing to worry about. The one that already failed has a black X on the RJ-45 jack.
+
+**Arduino:** This is a little more of a pain. Each Arduino has a number stored in memory - it's not in the code, it's in the storage on the chip. The Arduinos in use are numbered 1 to 4. A sticker on the back of each Arduino shows the number.
+
+The extra board is number 5. The software by default will ignore it. To make it work, you need to make 1 change in the processing software, near the top of SmaHeartServer.
+
+First, look at the back of the Arduino you are removing. It should have a number 1 to 4. Then, find this line in the code:
+
+`final int ReplacementBoardId = -1;`
+
+If you are replacing, say, board #3, replace `-1` with '3'.
+
+Run the program. Board #5 should now act like board #3.
+
+Be sure to connect the button as mentioned in the hardware notes, to pins 5 and ground.
