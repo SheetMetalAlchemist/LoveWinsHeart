@@ -42,6 +42,12 @@ int default_track_set = 2;
 //try -10, -20, -30, and -40 to make it quieter. DB is weird.
 final float background_volume_db = -10.0;
 
+//replacement board identifier.
+//see the readme before changing this variable.
+//if set to 1-4, the 5th, replacement arduino will replace that arduino as an input.
+//set this to -1 if the replacement isn't used.
+final int ReplacementBoardId = -1;
+
 
 void setup() {
   size(600, 400);

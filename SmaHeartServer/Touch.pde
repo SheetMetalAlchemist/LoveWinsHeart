@@ -87,6 +87,10 @@ void receive( byte[] data ) {       // <-- default handler
 
   int board_id = int( msg.substring( index_1+key_1.length(), index_2 ) );
   int state = int( msg.substring( index_2+key_2.length(), index_3 ) );
+  
+  if( (ReplacementBoardId >= 1) && (ReplacementBoardId <=4) && (board_id == 5) ) {
+    board_id = ReplacementBoardId;
+  }
 
   HandleStateChange( state, board_id );
   //println("board id: " + str(board_id) );
